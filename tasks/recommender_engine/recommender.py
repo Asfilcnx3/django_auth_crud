@@ -4,23 +4,17 @@ import pickle
 import faiss
 from datasets import load_dataset
 
+# Load dataset and data
 # Download embeddings from Hugging Face
 file_path = hf_hub_download(
     repo_id="asfilcnx3/embeddings_created",
     filename="embeddings.npy",
     repo_type='dataset'
 )
-
 embeddings = np.load(file_path)
 
-# Load dataset and data
-# Si tienes titles.pkl subido localmente aún
 with open("tasks/recommender_engine/titles.pkl", "rb") as f:
     titles_list = pickle.load(f)
-
-# Cargar títulos de dataset original
-dataset = load_dataset("asfilcnx3/clean-embedding-movies")
-titles_list = [title.lower() for title in dataset["train"]["title"]]
 
 # FAISS setup
 dimension = embeddings.shape[1]
