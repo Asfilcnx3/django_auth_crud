@@ -6,7 +6,7 @@
 <main class="container">
     <div class="col">
         <div class="col-md-6 offset-md-3">
-            <h1 class="text-center display-3 py-5">Tasks Pending</h1>
+            <h1 class="text-center display-3 py-5">{{ mode }}</h1>
             <ul class="list-group">
                 {% for task in tasks %}
                 <a class="list-group-item" href="{% url 'task_details' task.id %}">

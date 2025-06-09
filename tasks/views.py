@@ -68,7 +68,7 @@ def singout(request):
 @login_required  
 def tasks(request): 
     tasks = Task.objects.filter(user_id=request.user, date_completed__isnull = True)
-    return render(request, 'tasks.html', {'tasks': tasks})
+    return render(request, 'tasks.html', {'tasks': tasks, 'mode': 'Tasks Pending'})
 
 @login_required  
 def task_details(request, task_id):
@@ -129,7 +129,7 @@ def delete_task(request, task_id):
 @login_required  
 def task_completed(request):
     tasks = Task.objects.filter(user_id=request.user, date_completed__isnull=False).order_by('-date_completed')
-    return render(request, 'tasks.html', {'tasks': tasks})
+    return render(request, 'tasks.html', {'tasks': tasks, 'mode': 'Tasks Completed'})
 
 @login_required  
 def recomendator_form(request):
