@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<head>
+  <style>
+    .form-centered {
+        transition: all 0.6s ease;
+        margin: 0 auto;
+    }
+
+    .form-left {
+        transition: all 0.6s ease;
+        transform: translateX(-10%);
+    }
+
+    .recommendations-container {
+        opacity: 0;
+        transform: translateX(30%);
+        transition: all 0.6s ease;
+        pointer-events: none;
+    }
+
+    .show-recommendations {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+    </style>
+</head>
+
+<main class="container">
+  <div class="row d-flex justify-content-center align-items-start mt-5 {% if recommendations %}flex-row{% else %}flex-column{% endif %}">
+    <div class="col-md-5 {% if recommendations %}form-left{% else %}form-centered{% endif %}">
+      <h2>
+        Movie Recommender
+    </h2>
+      <form method="POST" class="card card-body">
+        {% csrf_token %}
+        <label for="title_query">
+            Enter a movie title:
+        </label>
+        <input type="text" name="title_query" id="title_query" value="{{ query }}" placeholder="Enter movie title" class="mt-1 mb-4 form-control form-control-lg" required>
+        <button type="submit" class="btn btn-dark">
+            {% if recommendations %}
+                Try another movie
+            {% else %}
+               Recommend
+            {% endif %}
+        </button>
+      </form>
+    </div>
+
+    <div class="col-md-5 recommendations-container {% if recommendations %}show-recommendations{% endif %}">
+      {% if recommendations %}
+        <h3>
+            Recommendations:
+        </h3>
+        <ul class="list-group">
+          {% for movie in recommendations %}
+            <a class="list-group-item">
+              <header class="d-flex">
+                <h3 class="fw-bold">
+                    {{ movie }}
+                </h3>
+              </header>
+            </a>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</main>
+
+{% endblock %}
