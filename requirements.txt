@@ -8,3 +8,4 @@ langchain-experimental
 gunicorn
 psycopg2-binary
 whitenoise
+dj_database_url
