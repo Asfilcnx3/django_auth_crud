@@ -30,5 +30,6 @@ urlpatterns = [
     path('tasks/<int:task_id>/complete', views.complete_task, name = 'complete_task'),
     path('tasks/<int:task_id>/delete', views.delete_task, name = 'delete_task'),
     path('tasks_completed/', views.task_completed, name = 'task_completed'),
-    path('recomendator/', views.recomendator_form, name='recomendator_form')
+    path('recomendator/', views.recomendator_form, name='recomendator_form'),
+    path('analyzer/', views.analyze_dataset, name = 'analyzer_form')
     ]

@@ -9,6 +9,9 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from .decorators import logout_required
 from .recommender_engine.recommender import recommend_by_title
+from django.core.files.storage import default_storage
+from .data_analyzer_engine.analyzer import df_analyzer
+import os
 
 # Create your views here.
 
@@ -143,4 +146,36 @@ def recomendator_form(request):
     return render(request, 'recomender/form.html', {
         'recommendations': recommendations,
         'query': query,
+    })
+
+@login_required
+def analyze_dataset(request):
+    answer = None
+    error = None
+
+    # Method on the call
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        question = request.POST.get('question')
+
+        if not file or not question:
+            error = 'No question or file provided'
+
+        else:
+            try:
+                # temporaly storage
+                file_path = default_storage.save(f"tmp/{file.name}", file)
+                abs_path = os.path.join(default_storage.location, file_path)
+
+                result = df_analyzer(abs_path, question)
+                if isinstance(result, tuple):
+                    answer, _ = result
+                else:
+                    answer = result
+            except Exception as e:
+                error = f"Error: {str(e)}"
+                
+    return render(request, 'analyzer/analyzer.html', {
+        'answer': answer,
+        'error': error
     })
