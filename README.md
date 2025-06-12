@@ -23,7 +23,7 @@ A full-stack web application built with Django that combines user authentication
 >- Render / GitHub Pages – Deployment
 
 # Local Installation (On Windows)
->- git clone https://github.com/yourusername/django_auth_crud.git
+>- git clone https://github.com/Asfilcnx3/django_auth_crud.git
 >- cd django_auth_crud
 >- py -m venv venv
 >- source venv\Scripts\activate
