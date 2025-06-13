@@ -28,7 +28,7 @@ def df_analyzer(file_path, query, historial=None):
         df = load_files(file_path)
 
         # Valid the DF size
-        if df.shape[0] > 10000 or df.shape[1] > 50:
+        if df.shape[0] > 500:
             return "El archivo es demasiado grande. Por favor usa un archivo más pequeño.", historial
 
         api_key = os.getenv("GOOGLE_API_KEY")
