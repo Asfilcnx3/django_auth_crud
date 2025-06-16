@@ -151,3 +151,6 @@ LOGIN_URL = '/singin'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = 'os.environ.get("REDIS_URL", "redis://localhost:6379/0")'
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL

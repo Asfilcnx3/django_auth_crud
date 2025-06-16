@@ -10,8 +10,10 @@ from django.contrib.auth.decorators import login_required
 from .decorators import logout_required
 from .recommender_engine.recommender import recommend_by_title
 from django.core.files.storage import default_storage
-from .data_analyzer_engine.analyzer import df_analyzer
+from djangocrud.tasks import process_file
 import os
+from celery.result import AsyncResult
+from django.urls import reverse
 
 # Create your views here.
 
@@ -152,30 +154,39 @@ def recomendator_form(request):
 def analyze_dataset(request):
     answer = None
     error = None
+    task_id = request.GET.get("task_id")
 
-    # Method on the call
     if request.method == 'POST':
         file = request.FILES.get('file')
         question = request.POST.get('question')
 
         if not file or not question:
             error = 'No question or file provided'
-
         else:
             try:
-                # temporaly storage
                 file_path = default_storage.save(f"tmp/{file.name}", file)
                 abs_path = os.path.join(default_storage.location, file_path)
-
-                result = df_analyzer(abs_path, question)
-                if isinstance(result, tuple):
-                    answer, _ = result
-                else:
-                    answer = result
+                task = process_file.delay(abs_path, question)
+                return redirect(f"{reverse('analyzer_form')}?task_id={task.id}")
             except Exception as e:
                 error = f"Error: {str(e)}"
-                
+
+    elif task_id:
+        result = AsyncResult(task_id)
+        if result.ready():
+            if result.successful():
+                answer = result.result
+            else:
+                error = str(result.result) or "There was an error processing the file"
+        else:
+            # Task is still processing
+            return render(request, 'analyzer/analyzer.html', {
+                'loading': True,
+                'task_id': task_id
+            })
+
     return render(request, 'analyzer/analyzer.html', {
         'answer': answer,
-        'error': error
+        'error': error,
+        'loading': False
     })

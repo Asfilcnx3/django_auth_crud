@@ -11,3 +11,5 @@ whitenoise
 dj_database_url
 huggingface_hub
 faiss-cpu
+redis
+celery

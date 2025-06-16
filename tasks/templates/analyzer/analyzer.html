@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 <head>
     <meta charset="UTF-8">
@@ -20,6 +19,15 @@
         <button type="submit">Send</button>
     </form>
 
+    {% if loading and not error and not answer %}
+        <h3>Processing file...</h3>
+        <script>
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000); // Reload every 3 seconds
+        </script>
+    {% endif %}
+
     {% if answer %}
         <h3>Answer:</h3>
         <p>{{ answer }}</p>
@@ -30,5 +38,4 @@
         <p>{{ error }}</p>
     {% endif %}
 </body>
-
 {% endblock %}

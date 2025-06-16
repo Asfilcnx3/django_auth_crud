@@ -6,7 +6,7 @@ import os
 
 # Create the function that allows to read csv, excel or json
 def load_files(file_path):
-    ext = os.path.splitext(file_path)[1]
+    ext = os.path.splitext(file_path)[1].lower()
     if ext == '.csv':
         try:
             df = pd.read_csv(file_path, encoding='utf-8', on_bad_lines='skip')
@@ -28,12 +28,12 @@ def df_analyzer(file_path, query, historial=None):
         df = load_files(file_path)
 
         # Valid the DF size
-        if df.shape[0] > 500:
-            return "El archivo es demasiado grande. Por favor usa un archivo más pequeño.", historial
+        if df.shape[0] > 10000 or df.shape[1] > 50:
+            return "The file is too large. Please, use a smaller file.", historial
 
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
-            return "No se encontró la API Key. Define GOOGLE_API_KEY como variable de entorno.", historial
+            return "No API Key. Define the GOOGLE_API_KEY as enviroment variable    .", historial
 
         llm = ChatGoogleGenerativeAI(
             model = "gemini-2.0-flash-exp",
