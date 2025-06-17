@@ -2,7 +2,6 @@ from huggingface_hub import hf_hub_download
 import numpy as np
 import pickle
 import faiss
-import os
 
 ## Load data only one time
 Embeddings = None
@@ -22,8 +21,7 @@ def load_model_once():
             repo_type='dataset'
         )
 
-        Embeddings = np.load(file_path, mmap_mode='r')
-
+        Embeddings = np.load(file_path)
 
         # Open the titles.pkl
         with open("tasks/recommender_engine/titles.pkl", "rb") as f:
@@ -32,7 +30,7 @@ def load_model_once():
         # FAISS setup
         dimension = Embeddings.shape[1]
         Faiss_Index = faiss.IndexFlatL2(dimension)
-        Faiss_Index.add(np.array(Embeddings))
+        Faiss_Index.add(Embeddings)
 
 def get_index_from_title(title_query):
     """
@@ -67,6 +65,6 @@ def recommend_by_title(title_query):
     if idx is None:
         return ["Movie not found. Please check the title and try again."]
 
-    _, idxs = Faiss_Index.search(np.array(Embeddings[idx:idx+1]), 6)
+    _, idxs = Faiss_Index.search(Embeddings[idx:idx+1], 6)
     similar_titles = [Title_List[i] for i in idxs[0] if i != idx]
     return similar_titles[:5]
