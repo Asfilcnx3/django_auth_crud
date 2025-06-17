@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 from pathlib import Path
 import dj_database_url
 import os
+
+load_dotenv()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -87,13 +90,18 @@ WSGI_APPLICATION = 'djangocrud.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 ENV = os.getenv('DJANGO_ENV', 'development')
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
 if ENV == 'production':
     DATABASES = {
-        'default': dj_database_url.config(
-            default='postgresql://postgres:postgres@localhost:5432/mysite',
-            conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+    }
 }
 else:
     DATABASES = {
