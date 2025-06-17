@@ -2,26 +2,39 @@ from huggingface_hub import hf_hub_download
 import numpy as np
 import pickle
 import faiss
+import os
 
-# Load dataset and data
-# Download embeddings from Hugging Face
-file_path = hf_hub_download(
-    repo_id="asfilcnx3/embeddings_created",
-    filename="embeddings.npy",
-    repo_type='dataset'
-)
-embeddings = np.load(file_path)
+## Load data only one time
+Embeddings = None
+Title_List = None
+Faiss_Index = None
 
-# Open the titles.pkl
-with open("tasks/recommender_engine/titles.pkl", "rb") as f:
-    titles_list = pickle.load(f)
+# Load dataset and data one
+def load_model_once():
+    global Embeddings, Title_List, Faiss_Index
 
-# FAISS setup
-dimension = embeddings.shape[1]
-faiss_index = faiss.IndexFlatL2(dimension)
-faiss_index.add(embeddings)
+    if Embeddings is None or Title_List is None or Faiss_Index is None:
 
-def get_index_from_title(title_query, titles_list):
+    # Download embeddings from Hugging Face
+        file_path = hf_hub_download(
+            repo_id="asfilcnx3/embeddings_created",
+            filename="embeddings.npy",
+            repo_type='dataset'
+        )
+
+        Embeddings = np.load(file_path, mmap_mode='r')
+
+
+        # Open the titles.pkl
+        with open("tasks/recommender_engine/titles.pkl", "rb") as f:
+            Title_List = pickle.load(f)
+
+        # FAISS setup
+        dimension = Embeddings.shape[1]
+        Faiss_Index = faiss.IndexFlatL2(dimension)
+        Faiss_Index.add(np.array(Embeddings))
+
+def get_index_from_title(title_query):
     """
     This function return the index of the name of the input title query if exists on the titles.pkl
 
@@ -33,7 +46,7 @@ def get_index_from_title(title_query, titles_list):
         index(int): The index of the title_query inside the list of titles
     """
     try:
-        return titles_list.index(title_query)
+        return Title_List.index(title_query)
     except ValueError:
         return None
 
@@ -47,11 +60,13 @@ def recommend_by_title(title_query):
     output:
         similar_titles(list): Return the first 5 titles of movies with similar embedding index.
     """
+    load_model_once()
+
     title_query = title_query.lower().strip()
-    idx = get_index_from_title(title_query, titles_list)
+    idx = get_index_from_title(title_query)
     if idx is None:
         return ["Movie not found. Please check the title and try again."]
 
-    _, indices = faiss_index.search(embeddings[idx:idx+1], 6)
-    similar_titles = [titles_list[i] for i in indices[0] if i != idx]
+    _, idxs = Faiss_Index.search(np.array(Embeddings[idx:idx+1]), 6)
+    similar_titles = [Title_List[i] for i in idxs[0] if i != idx]
     return similar_titles[:5]
