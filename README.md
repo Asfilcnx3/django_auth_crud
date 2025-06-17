@@ -34,10 +34,23 @@ A full-stack web application built with Django that combines user authentication
 
 # 09/06/2025 update
 ## Adding "Recommendation System with Embeddings"
-### How the Recommender Works
+### How the Recommender Works?
 - Movie titles are embedded as text vectors using a language model
 - These vectors are indexed using FAISS for fast similarity search
 - Instead of storing large .npy files in the repo, we host them on Hugging Face and load them at runtime
+
+# 17/06/2025 update
+## Debugging "Recommendation System with Embeddings"
+### How works now?
+- Now the recommender didn´t load when the service deploy
+- Now the recommender have more clean code
+- Now the database provider is "Neon"
+
+## Adding Demo of "Data Analyzer"
+### How the analyzer works? (Posible bugs)
+- In test works in 'Docker' with celery
+- In production Celery works with redis and render background
+- you can use with '/analyzer/'
 
 # Authentication
 >> User authentication is handled via Django
